@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Grenze_Gotisch } from "next/font/google";
 import "./globals.css";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
+export const LogoFont = Grenze_Gotisch({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -39,7 +36,11 @@ export default function RootLayout({
           sizes="any"
         />
       </head>
-      <body className={`${outfit.className} antialiased`}>{children}</body>
+      <body className={`${outfit.className} antialiased`}>
+        <Navbar />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

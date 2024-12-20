@@ -1,20 +1,24 @@
 import hero from "@/assets/products/hats/macaron_bandanas/blue_and_pink_bandana_3.jpg";
 import Product from "@/components/Product";
+import { LogoFont } from "./layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { delay } from "@/lib/utils";
-import { getWixClient } from "@/lib/wix-client.base";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getCollections } from "@/wix-api/collections";
+import { queryProducts } from "@/wix-api/products";
 
 export default function Home() {
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-5 py-10">
-      <div className="flex items-center bg-secondary md:h-96">
+      <div className="flex items-center bg-accent-foreground md:h-96">
         <div className="space-y-7 p-10 text-center md:w-1/2">
-          <h1 className="text-3xl font-semibold md:text-4xl">
+          <h1
+            className={`text-3xl font-bold md:text-4xl ${LogoFont.className}`}
+          >
             Wicked Whimsy Craft Shop!
           </h1>
           <p>A comfy and cozy stop at the junction of fiber arts.</p>
@@ -31,7 +35,7 @@ export default function Home() {
             alt="wicked whimsy hero"
             className="h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-secondary via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-accent-foreground via-transparent to-transparent" />
         </div>
       </div>
       <Suspense fallback={<LoadingSkeleton />}>
@@ -43,17 +47,15 @@ export default function Home() {
 
 async function FeaturedProducts() {
   await delay(1000);
-  const wixClient = getWixClient();
-  const { collection } =
-    await wixClient.collections.getCollectionBySlug("featured");
+  const collection = await getCollections("featured");
   if (!collection?._id) {
     return null;
   }
-  const featuredProducts = await wixClient.products
-    .queryProducts()
-    .hasSome("collectionIds", [collection._id])
-    .descending("lastUpdated")
-    .find();
+  const featuredProducts = await queryProducts({
+    collectionIds: collection._id,
+    sort: "last_updated",
+  });
+
   if (!featuredProducts.items.length) {
     return null;
   }
@@ -65,7 +67,6 @@ async function FeaturedProducts() {
           <Product key={product._id} product={product} />
         ))}
       </div>
-      <pre>{JSON.stringify(featuredProducts, null, 2)}</pre>
     </div>
   );
 }
